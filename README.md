@@ -4,6 +4,7 @@
 **Publication Date:** 30.10.2023  
 **Version:** 1.0  
 **Languages:** Croatian, English  
+**Latest update:** 27.10.2023.  
 **Summary:** A collection of data about various PC games for comparative analysis and more.  
 **Attributes:**
 - name
