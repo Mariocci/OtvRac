@@ -20,7 +20,7 @@
 - genre
   - Genre of the PC game
 - estimated_playtime_hours
-  - Estimated hours of gameplay for most games; undefined for continuous play games
+  - Estimated hours of gameplay for most games; undefined for "highly replayable" games
 - franchise
   - Franchise to which the game belongs; undefined if it doesn't belong to one
 - rating
