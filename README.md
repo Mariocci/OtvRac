@@ -1,5 +1,5 @@
 **Dataset Name**: PC Game Dataset  
-**License**: CC0 1.0  
+**License**: CC0 1.0 Universal  
 **Author:** Mario Perhat  
 **Publication Date:** 30.10.2023  
 **Version:** 1.0  
