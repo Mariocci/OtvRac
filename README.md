@@ -1,10 +1,10 @@
-**Dataset Name**: PC Game Dataset
-**License**: CC0 1.0
-**Author:** Mario Perhat
-**Publication Date:** 30.10.2023
-**Version:** 1.0
-**Languages:** Croatian, English
-**Summary:** A collection of data about various PC games for comparative analysis and more.
+**Dataset Name**: PC Game Dataset  
+**License**: CC0 1.0  
+**Author:** Mario Perhat  
+**Publication Date:** 30.10.2023  
+**Version:** 1.0  
+**Languages:** Croatian, English  
+**Summary:** A collection of data about various PC games for comparative analysis and more.  
 **Attributes:**
 - name
   - Name of the PC game
@@ -27,8 +27,8 @@
 - singleplayer
   - Boolean value indicating if the game is designed for singleplayer
 - multiplayer
-  - Boolean value indicating if the game is designed for multiplayer
-**Data format:** JSON, CSV
-**Data size:**
+  - Boolean value indicating if the game is designed for multiplayer  
+**Data format:** JSON, CSV  
+**Data size:**  
   - CSV 3 KB
   - JSON 6 KB
