@@ -1,0 +1,268 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.2
+-- Dumped by pg_dump version 15.2
+
+-- Started on 2023-10-30 15:09:34
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 216 (class 1259 OID 24627)
+-- Name: developer; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.developer (
+    ime_developera character varying NOT NULL,
+    godina_osnutka integer
+);
+
+
+ALTER TABLE public.developer OWNER TO postgres;
+
+--
+-- TOC entry 217 (class 1259 OID 24634)
+-- Name: developer_igra; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.developer_igra (
+    developer character varying NOT NULL,
+    ime_igra character varying NOT NULL
+);
+
+
+ALTER TABLE public.developer_igra OWNER TO postgres;
+
+--
+-- TOC entry 215 (class 1259 OID 24614)
+-- Name: igra; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.igra (
+    predvidjeni_br_sati_za_igranje integer,
+    cijena numeric,
+    fransiza character varying,
+    zanr character varying,
+    ime character varying NOT NULL,
+    datum_izdanja date,
+    prodani_primjerci integer,
+    ocjena numeric,
+    ime_izdavac character varying,
+    singleplayer boolean NOT NULL,
+    multiplayer boolean NOT NULL,
+    CONSTRAINT check_review_range CHECK (((ocjena >= (1)::numeric) AND (ocjena <= (10)::numeric)))
+);
+
+
+ALTER TABLE public.igra OWNER TO postgres;
+
+--
+-- TOC entry 214 (class 1259 OID 24607)
+-- Name: izdavac; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.izdavac (
+    ime_izdavac character varying NOT NULL,
+    datum_osnutka date,
+    hq character varying
+);
+
+
+ALTER TABLE public.izdavac OWNER TO postgres;
+
+--
+-- TOC entry 3340 (class 0 OID 24627)
+-- Dependencies: 216
+-- Data for Name: developer; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.developer (ime_developera, godina_osnutka) FROM stdin;
+Beenox	2000
+Blizzard Entertainment Inc.	1991
+Creative Assembly	1987
+Demonware	2003
+Eastshade Studios	2013
+Feral Interactive	1996
+High Moon Studios	2001
+Infinity Ward	2002
+Iron Gate AB	2019
+Paradox Development Studio	1995
+Polymorph Gaming	2016
+Raven Software	1990
+Riot Games	2006
+Sledgehammer Games	2009
+Treyarch	1996
+Ubisoft Bucharest	1992
+Ubisoft Kiev	2008
+Ubisoft Montreal	1997
+Ubisoft Shangai	1996
+Ubisoft Singapore	2008
+Unknown Worlds Entertainment	2001
+Ubisoft Quebec	2005
+\.
+
+
+--
+-- TOC entry 3341 (class 0 OID 24634)
+-- Dependencies: 217
+-- Data for Name: developer_igra; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.developer_igra (developer, ime_igra) FROM stdin;
+Ubisoft Montreal	Assassins Creed Odyssey
+Ubisoft Kiev	Assassins Creed Odyssey
+Ubisoft Montreal	Assassins Creed Black Flag
+Ubisoft Bucharest	Assassins Creed Odyssey
+Ubisoft Shangai	Assassins Creed Odyssey
+Ubisoft Singapore	Assassins Creed Odyssey
+Treyarch	Call of Duty: Modern Warfare
+Sledgehammer Games	Call of Duty: Modern Warfare
+Infinity Ward	Call of Duty: Modern Warfare
+Beenox	Call of Duty: Modern Warfare
+Raven Software	Call of Duty: Modern Warfare
+High Moon Studios	Call of Duty: Modern Warfare
+Demonware	Call of Duty: Modern Warfare
+Iron Gate AB	Valheim
+Creative Assembly	Total War Warhammer 3
+Creative Assembly	Total War Warhammer 2
+Creative Assembly	Total War Warhammer
+Unknown Worlds Entertainment	Subnautica
+Paradox Development Studio	Stellaris
+Blizzard Entertainment Inc.	Overwatch
+Riot Games	Leauge of Legends
+Polymorph Gaming	Foundation
+Ubisoft Montreal	Assassins Creed Origins
+Ubisoft Quebec	Assassins Creed Odyssey
+Ubisoft Quebec	Assassins Creed Syndicate
+\.
+
+
+--
+-- TOC entry 3339 (class 0 OID 24614)
+-- Dependencies: 215
+-- Data for Name: igra; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.igra (predvidjeni_br_sati_za_igranje, cijena, fransiza, zanr, ime, datum_izdanja, prodani_primjerci, ocjena, ime_izdavac, singleplayer, multiplayer) FROM stdin;
+\N	0	\N	MOBA	Leauge of Legends	2009-10-27	\N	9.2	Riot Games	f	t
+\N	59.99	Total War	Strategy	Total War Warhammer	2016-05-24	2080000	8.6	SEGA	t	f
+\N	59.99	Total War	Strategy	Total War Warhammer 2	2017-09-28	955000	9.1	SEGA	t	f
+\N	59.99	Total War	Strategy	Total War Warhammer 3	2022-02-17	36000000	9	SEGA	t	f
+24	39.99	Assassins Creed	Action	Assassins Creed Black Flag	2013-10-29	11000000	8.5	Ubisoft	t	f
+30	59.99	Assassins Creed	RPG	Assassins Creed Origins	2017-12-15	10000000	9	Ubisoft	t	f
+30	59.99	Assassins Creed	RPG	Assassins Creed Odyssey	2018-10-05	10000000	9.2	Ubisoft	t	f
+30	39.99	Assassins Creed	Action	Assassins Creed Syndicate	2015-10-23	4120000	8.2	Ubisoft	t	f
+\N	39.99	\N	4X	Stellaris	2016-05-09	500000	6.3	Paradox Interactive	t	f
+15	24.5	\N	Indie	Eastshade	2019-02-13	127000	8.5	Eastshade Studios	t	f
+\N	29.99	\N	Indie	Foundation	2019-02-01	110000	9	Polymorph Gaming	t	f
+30	29.99	\N	Indie	Subnautica	2018-01-23	6000000	9.1	Unknown Worlds Entertainment	t	f
+76	19.99	\N	RPG	Valheim	2021-02-02	12000000	9	Coffee Stain Publishing	f	t
+\N	0	\N	FPS	Overwatch	2016-05-03	50000000	10	Blizzard Entertainment Inc.	t	f
+6	69.99	Call of Duty	FPS	Call of Duty: Modern Warfare	\N	0	\N	Activision	t	t
+\.
+
+
+--
+-- TOC entry 3338 (class 0 OID 24607)
+-- Dependencies: 214
+-- Data for Name: izdavac; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.izdavac (ime_izdavac, datum_osnutka, hq) FROM stdin;
+Riot Games	2006-09-01	Los Angeles
+SEGA	1960-06-03	Tokyo
+Ubisoft	1986-03-28	Montreal
+Paradox Interactive	2004-01-01	Stockholm
+Eastshade Studios	2013-12-01	Bellevue
+Polymorph Gaming	2016-02-01	Quebec
+Unknown Worlds Entertainment	2001-10-01	San Francisco
+Coffee Stain Publishing	2010-01-01	Skovde
+Blizzard Entertainment Inc.	1991-02-08	Irvine
+Activision	\N	\N
+\.
+
+
+--
+-- TOC entry 3192 (class 2606 OID 24640)
+-- Name: developer_igra developer_igra_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.developer_igra
+    ADD CONSTRAINT developer_igra_pkey PRIMARY KEY (developer, ime_igra);
+
+
+--
+-- TOC entry 3190 (class 2606 OID 24633)
+-- Name: developer developer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.developer
+    ADD CONSTRAINT developer_pkey PRIMARY KEY (ime_developera);
+
+
+--
+-- TOC entry 3188 (class 2606 OID 24620)
+-- Name: igra igra_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.igra
+    ADD CONSTRAINT igra_pkey PRIMARY KEY (ime);
+
+
+--
+-- TOC entry 3186 (class 2606 OID 24613)
+-- Name: izdavac izdavac_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.izdavac
+    ADD CONSTRAINT izdavac_pkey PRIMARY KEY (ime_izdavac);
+
+
+--
+-- TOC entry 3194 (class 2606 OID 24646)
+-- Name: developer_igra developer; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.developer_igra
+    ADD CONSTRAINT developer FOREIGN KEY (developer) REFERENCES public.developer(ime_developera);
+
+
+--
+-- TOC entry 3193 (class 2606 OID 24621)
+-- Name: igra igra_ime_izdavac_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.igra
+    ADD CONSTRAINT igra_ime_izdavac_fkey FOREIGN KEY (ime_izdavac) REFERENCES public.izdavac(ime_izdavac);
+
+
+--
+-- TOC entry 3195 (class 2606 OID 24641)
+-- Name: developer_igra ime_igra; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.developer_igra
+    ADD CONSTRAINT ime_igra FOREIGN KEY (ime_igra) REFERENCES public.igra(ime);
+
+
+-- Completed on 2023-10-30 15:09:34
+
+--
+-- PostgreSQL database dump complete
+--
+
