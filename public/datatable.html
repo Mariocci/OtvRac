@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Table</title>
+  
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+  <script src="/scripts/script.js"></script>
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+
+<div id="search">
+  <label for="select">Select:</label>
+  <select id="select">
+    <option value="">Search All Columns</option>
+    <option value="0">Game Title</option>
+    <option value="1">Publisher</option>
+    <option value="2">Developers</option>
+    <option value="3">Release Date</option>
+    <option value="4">Price</option>
+    <option value="5">Genre</option>
+    <option value="6">Estimated Playtime (hours)</option>
+    <option value="7">Franchise</option>
+    <option value="8">Rating</option>
+    <option value="9">Singleplayer</option>
+    <option value="10">Multiplayer</option>
+  </select>
+  <form id="searchForm" onsubmit="return false;">
+    <label for="fsearch">Search:</label>
+    <input type="text" id="fsearch">
+    <input type="submit" value="Search" onclick="performSearch()">
+  </form>
+</div>
+
+<table id="myTable">
+  <thead>
+    <tr>
+      <th>Game Title</th>
+      <th>Publisher</th>
+      <th>Developers</th>
+      <th>Release Date</th>
+      <th>Price</th>
+      <th>Genre</th>
+      <th>Estimated Playtime (hours)</th>
+      <th>Franchise</th>
+      <th>Rating</th>
+      <th>Singleplayer</th>
+      <th>Multiplayer</th>
+    </tr>
+  </thead>
+  <tbody>
+   
+  </tbody>
+</table>
+<div id="downloadsFiltered">
+  <button onclick="downloadCSVfilter()">Download CSV filtered</button>
+  <button onclick="downloadJSONfilter()">Download JSON filtered</button>
+</div>
+<script>
+$(document).ready(function () {
+  fetch('../data/PC_igre.json')  
+    .then(response => response.json()) 
+    .then(data => {
+      console.log('Data:', data);
+      initializeDataTable(data);
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function initializeDataTable(data) {
+  var table = $('#myTable').DataTable({
+    data: data,
+    columns: [
+      { data: 'game_data.ime_igre', title: 'Game Title' },
+      { data: 'game_data.ime_izdavac', title: 'Publisher' },
+      {
+        data: 'game_data.developeri',
+        title: 'Developers',
+        render: function (data) {
+          return data ? data.map((dev) => dev.developer).join(', ') : 'N/A';
+        },
+      },
+      { data: 'game_data.datum_izdanja', title: 'Release Date' },
+      { data: 'game_data.cijena', 
+        title: 'Price',
+        render: function (data) {
+          return data !== null ? (data === 0 ? 'FREE' : data + ' €') : '-';
+        },
+      },
+      { data: 'game_data.zanr', title: 'Genre' },
+      {
+        data: 'game_data.predvidjeni_br_sati_za_igranje',
+        title: 'Estimated Playtime (hours)',
+        render: function (data) {
+          return data !== null ? data + ' hours' : '-';
+        },
+      },
+      { data: 'game_data.fransiza', title: 'Franchise', render: function (data) {
+        return data || '-';
+      }},
+      { data: 'game_data.ocjena', title: 'Rating', render: function (data) {
+        return data !== null ? data : '-';
+      }},
+      { data: 'game_data.singleplayer', title: 'Singleplayer', render: function (data) {
+        return data !== null ? (data ? 'Yes' : 'No') : 'No';
+      }},
+      { data: 'game_data.multiplayer', title: 'Multiplayer', render: function (data) {
+        return data !== null ? (data ? 'Yes' : 'No') : 'No';
+      }},
+    ],
+    initComplete: function(settings, json) {
+      console.log('DataTable initialized:', this);
+      if (this && this.api && this.api().data) {
+        var tableData = this.api().data().toArray();
+        console.log('Table data:', tableData);
+      }
+    }
+  });
+}
+
+function performSearch() {
+  var table = $('#myTable').DataTable();
+  var columnIdx = $('#select').val();
+  var searchTerm = $('#fsearch').val();
+
+  table.column(columnIdx).search(searchTerm).draw();
+}
+
+function downloadCSVfilter() {
+  console.log("Download CSV function called.");
+  var table = $('#myTable').DataTable();
+  console.log('DataTable:', table);
+
+  var data = table.rows({ search: 'applied' }).data().toArray();
+  console.log('Data:', data);
+
+  var gameNames = data.map(row => row['game_data']['ime_igre']);
+  console.log('Mapped:', gameNames);
+
+  $.ajax({
+    type: "GET",
+    url: "/data/PC_igre.csv",
+    dataType: "text",
+    success: function(csvData) {
+      var lines = csvData.split('\n');
+      console.log('Lines:', lines);
+
+      var csvGameNames = lines.map(line => line.split(',')[0]);
+      console.log('CSV Game Names:', csvGameNames);
+
+      var filteredLines = lines.filter(line => {
+        var gameName = line.split(',')[0].trim();
+        return gameNames.includes(gameName);
+      });
+
+      console.log('Filtered Lines:', filteredLines);
+
+      var csvContent = "data:text/csv;charset=utf-8," + lines[0] + '\r\n';
+      csvContent += filteredLines.join('\r\n');
+      console.log("content:", csvContent);
+      
+      var encodedUri = encodeURI(csvContent);
+      var link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "filtered_data.csv");
+      document.body.appendChild(link);
+      link.click();
+    }
+  });
+}
+
+
+function downloadJSONfilter() {
+  var table = $('#myTable').DataTable();
+  console.log('DataTable:', table);
+  var data = table.rows({ search: 'applied' }).data().toArray();
+  
+
+  var jsonContent = JSON.stringify(data, null, 2);
+  var blob = new Blob([jsonContent], { type: "application/json" });
+  var link = document.createElement("a");
+  link.setAttribute("href", URL.createObjectURL(blob));
+  link.setAttribute("download", "data.json");
+  document.body.appendChild(link);
+  link.click();
+}
+</script>
+
+</body>
+</html>
