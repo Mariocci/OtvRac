@@ -5,6 +5,8 @@ const path = require('path');
 const port = 8000;
 const routes = require('./routes/routes'); 
 
+app.use(express.json());
+
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/', routes);
 
