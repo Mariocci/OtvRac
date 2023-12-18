@@ -462,6 +462,19 @@ router.get('/api/pricerange/:minPrice/:maxPrice', async (req, res) => {
     res.status(500).json(errorResponse);
   }
 });
+router.get('/openapi', (req, res) => {
+  const openapiPath = path.join(__dirname, '../../docs/openapi.yaml');
+
+  res.setHeader('Content-Type', 'application/x-yaml');
+
+  try {
+    res.sendFile(openapiPath);
+  } catch (error) {
+    console.error('Error sending OpenAPI file:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 
 function convertToCsv(jsonData) {
   const header = Object.keys(jsonData[0]).join(',') + '\n';
