@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
 const path = require('path');
 const fs = require('fs').promises;
 const { Pool } = require('pg');
+const axios = require('axios');
+const session = require('express-session');
 
 const pool = new Pool({
     user: 'postgres',
@@ -110,7 +113,27 @@ router.get('/api/games', async (req, res) => {
 
     const result = await pool.query(query);
     const jsonData = result.rows;
-
+    const transformedData = jsonData.map((game) => {
+      return {
+        "@context": {
+          "ime_igre": "https://schema.org/name",
+          "datum_izdanja": "https://schema.org/datePublished",
+          "ocjena": "https://schema.org/price"
+        },
+        "@type": "Game",
+        zanr: game.game_data.zanr,
+        cijena: game.game_data.cijena,
+        ocjena: game.game_data.ocjena,
+        fransiza: game.game_data.fransiza,
+        ime_igre: game.game_data.ime_igre,
+        developeri: game.game_data.developeri,
+        ime_izdavac: game.game_data.ime_izdavac,
+        multiplayer: game.game_data.multiplayer,
+        singleplayer: game.game_data.singleplayer,
+        datum_izdanja: game.game_data.datum_izdanja,
+        predvidjeni_br_sati_za_igranje: game.game_data.predvidjeni_br_sati_za_igranje
+      };
+    });
     if (jsonData.length === 0) {
       const response = {
         status: 'OK',
@@ -122,7 +145,7 @@ router.get('/api/games', async (req, res) => {
       const response = {
         status: 'OK',
         message: 'Fetched game objects',
-        response: jsonData
+        response: transformedData
       };
 
       res.status(200).json(response);
@@ -179,7 +202,28 @@ router.get('/api/game/:ime_igre', async (req, res) => {
       const response = {
         status: 'OK',
         message: 'Fetched game',
-        response: jsonData
+        response : {
+              game_data: {
+                "@context": {
+                  "ime_igre": "https://schema.org/name",
+                  "datum_izdanja": "https://schema.org/datePublished",
+                  "cijena": "https://schema.org/price"
+                },
+                "@type": "Game",
+                zanr: jsonData[0].game_data.zanr,
+                cijena: jsonData[0].game_data.cijena,
+                ocjena: jsonData[0].game_data.ocjena,
+                fransiza: jsonData[0].game_data.fransiza,
+                ime_igre: jsonData[0].game_data.ime_igre,
+                developeri: jsonData[0].game_data.developeri,
+                ime_izdavac: jsonData[0].game_data.ime_izdavac,
+                multiplayer: jsonData[0].game_data.multiplayer,
+                singleplayer: jsonData[0].game_data.singleplayer,
+                datum_izdanja: jsonData[0].game_data.datum_izdanja,
+                predvidjeni_br_sati_za_igranje: jsonData[0].game_data.predvidjeni_br_sati_za_igranje
+              }
+            }
+          
       };
 
       res.status(200).json(response);
@@ -211,8 +255,11 @@ router.delete('/api/game/:ime_igre', async (req, res) => {
       };
       res.status(404).json(response);
     } else {
+      const deleteQuery1 = 'DELETE FROM developer_igra WHERE ime_igra = $1';
+      await pool.query(deleteQuery1, [ime_igre]);
       const deleteQuery = 'DELETE FROM igra WHERE ime = $1';
       await pool.query(deleteQuery, [ime_igre]);
+      
 
       const successResponse = {
         status: 'OK',
@@ -233,10 +280,10 @@ router.delete('/api/game/:ime_igre', async (req, res) => {
 });
 
 //put za promijenit cijenu igre
-router.put('/api/game/:ime_igre/:nova_cijena', async (req, res) => {
+router.put('/api/game/:ime_igre', async (req, res) => {
   try {
     const { ime_igre } = req.params;
-    const { nova_cijena } = req.params;
+    const { nova_cijena } = req.body;
 
 
   const checkQuery = 'SELECT COUNT(*) FROM igra WHERE ime = $1';
@@ -285,7 +332,7 @@ router.post('/api/game', async (req, res) => {
     let checkQuery = `SELECT COUNT(*) FROM igra WHERE ime = $1`;
     const checkResult1 = await pool.query(checkQuery, [gameData.ime]);
     checkQuery = `SELECT COUNT(*) FROM developer WHERE  developer.ime_developera = $1`;
-    const checkResult2 = await pool.query(checkQuery, [gameData.developer]);
+    const checkResult2 = await pool.query(checkQuery, [gameData.developeri]);
 
     
     if (checkResult1.rows[0].count !== '0') {
@@ -306,7 +353,7 @@ router.post('/api/game', async (req, res) => {
       res.status(400).json(errorResponse);
       return;
     }
-
+    
     const insertQuery = 'INSERT INTO igra (ime, ime_izdavac, datum_izdanja, cijena, zanr, predvidjeni_br_sati_za_igranje, fransiza, ocjena, singleplayer, multiplayer) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)';
     await pool.query(insertQuery, [
       gameData.ime,
@@ -320,6 +367,8 @@ router.post('/api/game', async (req, res) => {
       gameData.singleplayer,
       gameData.multiplayer
   ]);
+    const insertQuery1 = 'INSERT INTO developer_igra  (ime_igra, developer) VALUES ($1,$2)';
+    await pool.query(insertQuery1, [gameData.ime,gameData.developeri]);
 
     res.status(201).json({ message: 'Game added successfully', data: gameData });
   } catch (error) {
@@ -392,7 +441,26 @@ router.get('/api/freegames', async (req, res) => {
 
     const result = await pool.query(query);
     const jsonData = result.rows;
-
+    const transformedData = jsonData.map((game) => {
+      return {
+        "@context": {
+          "ime_igre": "https://schema.org/name",
+          "cijena": "https://schema.org/price"
+        },
+        "@type": "Game",
+        zanr: game.game_data.zanr,
+        cijena: game.game_data.cijena,
+        ocjena: game.game_data.ocjena,
+        fransiza: game.game_data.fransiza,
+        ime_igre: game.game_data.ime_igre,
+        developeri: game.game_data.developeri,
+        ime_izdavac: game.game_data.ime_izdavac,
+        multiplayer: game.game_data.multiplayer,
+        singleplayer: game.game_data.singleplayer,
+        datum_izdanja: game.game_data.datum_izdanja,
+        predvidjeni_br_sati_za_igranje: game.game_data.predvidjeni_br_sati_za_igranje
+      };
+    });
     if (jsonData.length === 0) {
       const response = {
         status: 'OK',
@@ -404,7 +472,7 @@ router.get('/api/freegames', async (req, res) => {
       const response = {
         status: 'OK',
         message: 'Fetched free games',
-        response: jsonData,
+        response: transformedData,
       };
       res.status(200).json(response);
     }
@@ -482,4 +550,7 @@ function convertToCsv(jsonData) {
   return header + rows.join('');
 }
 
+
+
 module.exports = router;
+
