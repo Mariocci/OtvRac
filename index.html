@@ -6,8 +6,8 @@
     <title>Document</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="/scripts/script.js"></script>
-    <link rel="stylesheet" href="/styles/main.css">
+    <script src="scripts/script.js"></script>
+    <link rel="stylesheet" href="styles/main.css">
     <link href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" rel="stylesheet">
     <title>PC Game Dataset</title>
     <meta name="author" content="Mario Perhat">
@@ -18,6 +18,74 @@
     <meta name="latest-update" content="27.10.2023">
 </head> 
 <body>
+    <script>
+        function hideLoginButton() {
+            document.getElementById('loginLink').style.display = 'none';
+        }
+
+        function showLogoutAndOtherLinks() {
+            document.getElementById('logoutLink').style.display = 'block';
+            document.getElementById('userProfileLink').style.display = 'block';
+            document.getElementById('refreshImagesLink').style.display = 'block';
+        }
+        document.addEventListener('DOMContentLoaded', checkLocalSession());
+
+        function showLoginButton() {
+            document.getElementById('loginLink').style.display = 'block';
+        }
+
+        function hideLogoutAndOtherLinks() {
+            document.getElementById('logoutLink').style.display = 'none';
+            document.getElementById('userProfileLink').style.display = 'none';
+            document.getElementById('refreshImagesLink').style.display = 'none';
+        }
+
+        $(document).ready(function () {
+            callCreateFilesEndpoint();
+            checkLocalSession();
+            fetch('../data/PC_igre.json')  
+                .then(response => response.json()) 
+                .then(data => {
+                    console.log('Data:', data);
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
+        function callCreateFilesEndpoint() {
+            fetch('/create-files', { method: 'GET' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.text(); 
+                })
+                .then(data => {
+                    console.log(data); 
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+        }
+        async function checkLocalSession() {
+        try {
+        const response = await fetch('/authentication-status');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.isAuthenticated) {
+                showLogoutAndOtherLinks();
+                hideLoginButton();
+            } else {
+                showLogoutAndOtherLinks();
+                showLoginButton();
+            }
+        } else {
+            console.error('Failed to check session status');
+        }
+    } catch (error) {
+        console.error('Error checking local session:', error);
+    }
+}
+    </script>
     <div id="info">
         
         <h1 id="naslov">PC Game Dataset</h1>
@@ -28,13 +96,18 @@
         <p><strong>Latest Data Update:</strong> 27.10.2023</p>
         <p><strong>Summary:</strong> Tablica nekih zanimljivih podataka o PC igrama. Omogućeno je pretraživanje i preuzimanje podataka u .json ili .csv formatu.</p>
     </div>
+    <a href="http://localhost:8000/login" id="loginLink"><button>Prijava</button></a>
+    <a href="http://localhost:8000/logout" id="logoutLink" style="display:none;">Odjava</a>
+    <a href="/userprofile" id="userProfileLink" style="display:none;">Korisnički profil</a>
+    <a href="/create-files" id="refreshImagesLink" style="display:none;">Osvježi preslike</a>
     <div id="downloads">
         <a href="data/PC_igre.csv" download="PC_igre.csv"><button>Download CSV</button></a>
         <a href="data/PC_igre.json" download="PC_igre.json"><button>Download JSON</button></a>
       </div>
     <iframe src="datatable.html" width="100%" frameborder="0" id="frame"></iframe>
     
-    
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/1.13/auth0-spa-js.production.js"></script>
+
 </body>
 </html>
-<script></script>
+
